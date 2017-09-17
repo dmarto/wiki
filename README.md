@@ -1,7 +1,6 @@
 # wiki
 
-wiki is a self-hosted wiki engine/content management system that lets
-you create and share content in Markdown format (for now).
+wiki is a self-hosted wiki engine for static markdown files
 
 ### Source
 
@@ -17,14 +16,13 @@ Run wiki:
 $ wiki
 ```
 
-Visit: http://localhost:8000/
-
-Start creating/editing content!
-
 ## Configuration
 
-By default wiki pages are stored in `./data` in the local directory. This can
-be changed by supplying the `-data /path/to/data` option.
+By default wiki pages are stored in `./data` in the local directory.
+This can be changed by supplying the `-data /path/to/data` option.
+
+By default wiki binds to `0.0.0.0:8000`.
+This can be changed by supplying the `-bind [addr]:<port>` option.
 
 ## License
 

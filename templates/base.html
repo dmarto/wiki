@@ -8,8 +8,19 @@
 
 		<title>{{.Title}}</title>
 
-		<link rel="stylesheet" href="/css/spectre.ext.css">
-		{{ template "styles" . }}
+		<style type="text/css">
+			@import url("https://unpkg.com/spectre.css/dist/spectre.min.css");
+			@import url("https://unpkg.com/spectre.css/dist/spectre-exp.min.css");
+			@import url("https://unpkg.com/spectre.css/dist/spectre-icons.min.css");
+
+			.bg-white {
+				background: #ffffff;
+			}
+
+			.font-size-120 {
+				font-size: 120px;
+			]
+		</style>
 	</head>
 <body class="bg-gray">
 	<section class="container p-2">
@@ -17,7 +28,7 @@
 			<div class="column col-6 col-mx-auto">
 				<header class="navbar">
 					<section class="navbar-section">
-						<a href="/home" class="navbar-brand p-2">Home</a>
+						<a href="/" class="navbar-brand p-2">Home</a>
 					</section>
 					<section class="navbar-section">
 						{{ template "actions" . }}
@@ -39,5 +50,4 @@
 </html>
 {{end}}
 
-{{ define "styles" }}{{ end }}
 {{ define "scripts" }}{{ end }}
