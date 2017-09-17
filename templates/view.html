@@ -1,43 +1,12 @@
+{{define "actions"}}
+	<div class="btn-group btn-group-block">
+		<button class="btn btn-primary"><i class="icon icon-mail"></i></button>
+		<button class="btn btn-primary"><i class="icon icon-download"></i></button>
+		<button class="btn btn-primary"><i class="icon icon-edit"></i></button>
+		<button class="btn btn-primary"><i class="icon icon-delete"></i></button>
+	</div>
+{{end}}
+
 {{define "content"}}
-<section class="container">
-  <div class="columns">
-    <div class="column">
-      {{.HTML}}
-    </div>
-  </div>
-</section>
-<section class="container">
-  <div class="columns">
-    <div class="column col-3">
-      <div class="dropdown">
-        <div class="btn-group">
-          <a class="btn btn-sm btn-primary" href="/edit/{{.Title}}">
-            <i class="icon icon-edit"></i>
-            Edit
-          </a>
-          <a class="btn btn-sm btn-primary dropdown-toggle" tabindex="0">
-            <i class="icon icon-caret"></i>
-          </a>
-          <ul class="menu">
-            <li class="menu-item">
-              <a href="#dropdowns">
-                <i class="icon icon-delete"></i>
-                Delete
-              </a>
-            </li>
-            <li class="menu-item">
-              <a href="#dropdowns">
-                <i class="icon icon-resize-horiz"></i>
-                Rename
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="column col-9 text-left">
-      <p>Last edited: ...</p>
-    </div>
-  </div>
-</section>
+{{.HTML}}
 {{end}}
