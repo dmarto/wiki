@@ -1,14 +1,11 @@
-.PHONY: dev build clean
-
-dev: build
-	./wiki
+.PHONY: build build-run clean
 
 build: clean
 	go get -t ./
-	go build ./
+	go build  ./
 
-test:
-	go test ./
+build-run: build
+	./wiki
 
 clean:
-	rm -rf wiki
+	rm -f wiki
