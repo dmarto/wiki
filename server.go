@@ -5,9 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
-	"github.com/julienschmidt/httprouter"
 
-	"github.com/microcosm-cc/bluemonday"
+	"github.com/julienschmidt/httprouter"
 	"github.com/russross/blackfriday"
 )
 
@@ -17,7 +16,7 @@ type Page struct {
 }
 
 func LoadWiki(title string, datadir string) (*Page, error) {
-	filename := path.Join(datadir, title+".txt")
+	filename := path.Join(datadir, title + ".md")
 
 	body, err := ioutil.ReadFile(filename)
 
@@ -25,8 +24,7 @@ func LoadWiki(title string, datadir string) (*Page, error) {
 		return nil, err
 	}
 
-	unsafe := blackfriday.MarkdownCommon(body)
-	html := bluemonday.UGCPolicy().SanitizeBytes(unsafe)
+	html := blackfriday.MarkdownCommon(body)
 
 	return &Page{
 		Title: title,
@@ -34,36 +32,22 @@ func LoadWiki(title string, datadir string) (*Page, error) {
 	}, nil
 }
 
-
 type Server struct {
-	config    Config
-	router    *httprouter.Router
-	templates *Templates
-}
-
-func (s *Server) render(name string, w http.ResponseWriter, ctx interface{}) {
-	buf, err := s.templates.Exec(name, ctx)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	_, err = buf.WriteTo(w)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	view    *template.Template
+	config  Config
+	router  *httprouter.Router
 }
 
 func ServerInit(config Config) *Server {
+
+	tmpl := template.New("base")
+	tmpl, _ = template.ParseFiles("templates/base.html")
+
 	server := &Server{
-		config:    config,
-		router:    httprouter.New(),
-		templates: NewTemplates("base"),
+		view:   tmpl,
+		config: config,
+		router: httprouter.New(),
 	}
-
-	tmplView := template.New("view")
-	template.Must(tmplView.ParseFiles("templates/view.html", "templates/base.html"))
-
-	server.templates.Add("view", tmplView)
 
 	server.router.GET("/", server.RootHandler())
 	server.router.GET("/w/:title", server.WikiHandler())
@@ -79,7 +63,7 @@ func ServerInit(config Config) *Server {
 func (s *Server) RootHandler() httprouter.Handle {
 	// TODO, get list of all wikis
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		s.render("view", w, &Page{
+		s.view.Execute(w, &Page{
 			Title: "title",
 			HTML:  template.HTML("<h1>asd</h1>"),
 		})
@@ -97,6 +81,6 @@ func (s *Server) WikiHandler() httprouter.Handle {
 			return
 		}
 
-		s.render("view", w, page)
+		s.view.Execute(w, page)
 	}
 }

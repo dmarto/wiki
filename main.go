@@ -12,7 +12,7 @@ type Config struct {
 func main() {
 	var config Config
 
-	flag.StringVar(&config.data, "data", "./data", "path to data")
+	flag.StringVar(&config.data, "data", "./", "path to data")
 	flag.StringVar(&config.bind, "bind", "0.0.0.0:8000", "[addr]:<port> to bind to")
 	flag.Parse()
 
