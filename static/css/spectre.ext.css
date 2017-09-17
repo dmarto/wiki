@@ -1,0 +1,11 @@
+@import url("https://unpkg.com/spectre.css/dist/spectre.min.css");
+@import url("https://unpkg.com/spectre.css/dist/spectre-exp.min.css");
+@import url("https://unpkg.com/spectre.css/dist/spectre-icons.min.css");
+
+.bg-white {
+    background: #ffffff;
+}
+
+.font-size-120 {
+    font-size: 120px;
+]
