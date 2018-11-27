@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os/exec"
 	"path"
 
 	"github.com/bmatcuk/doublestar"
@@ -23,6 +24,8 @@ func main() {
 	flag.StringVar(&config.data, "data", "./", "path to data")
 	flag.StringVar(&config.bind, "bind", "0.0.0.0:9000", "[addr]:<port> to bind to")
 	flag.Parse()
+
+	exec.Command("xdg-open", "http://" + config.bind).Run()
 
 	ServerInit(config)
 }
