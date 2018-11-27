@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/bmatcuk/doublestar"
 	"github.com/julienschmidt/httprouter"
-	"github.com/russross/blackfriday"
-
 	"github.com/namsral/flag"
+	"github.com/shurcooL/github_flavored_markdown"
 )
 
 type Config struct {
@@ -21,7 +21,7 @@ func main() {
 	var config Config
 
 	flag.StringVar(&config.data, "data", "./", "path to data")
-	flag.StringVar(&config.bind, "bind", "0.0.0.0:8000", "[addr]:<port> to bind to")
+	flag.StringVar(&config.bind, "bind", "0.0.0.0:9000", "[addr]:<port> to bind to")
 	flag.Parse()
 
 	ServerInit(config)
@@ -32,8 +32,8 @@ type Page struct {
 	HTML  template.HTML
 }
 
-func LoadWiki(title string, dir string) (*Page, error) {
-	filename := path.Join(dir, title + ".md")
+func LoadWiki(file string, dir string) (*Page, error) {
+	filename := path.Join(dir, file)
 
 	body, err := ioutil.ReadFile(filename)
 
@@ -41,10 +41,10 @@ func LoadWiki(title string, dir string) (*Page, error) {
 		return nil, err
 	}
 
-	html := blackfriday.MarkdownCommon(body)
+	html := github_flavored_markdown.Markdown(body)
 
 	return &Page{
-		Title: title,
+		Title: filename,
 		HTML:  template.HTML(html),
 	}, nil
 }
@@ -64,32 +64,36 @@ func ServerInit(config Config) *Server {
 	}
 
 	server.router.GET("/", server.RootHandler())
-	server.router.GET("/w/:title", server.WikiHandler())
-
-	// TODO 404
+	server.router.GET("/w/*file", server.WikiHandler())
 
 	http.ListenAndServe(server.config.bind, server.router)
 
 	return server
 }
 
-// Root Route Handler
 func (s *Server) RootHandler() httprouter.Handle {
-	// TODO, get list of all wikis
+
+	pages, _ := doublestar.Glob("./**/*.md")
+
+	list := ""
+
+	for _, page := range pages {
+		list += "<h2><a href='w/" + page + "'>" + page + "</a></h2>"
+	}
+
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		s.view.Execute(w, &Page{
-			Title: "title",
-			HTML:  template.HTML("<h1>asd</h1>"),
+			Title: "Index",
+			HTML:  template.HTML(list),
 		})
 	}
 }
 
-// Wiki Route Handler
 func (s *Server) WikiHandler() httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		title := p.ByName("title")
+		file := p.ByName("file")
 
-		page, err := LoadWiki(title, s.config.data)
+		page, err := LoadWiki(file, s.config.data)
 		if err != nil {
 			http.Redirect(w, r, "/", http.StatusFound)
 			return
@@ -137,21 +141,9 @@ var baseTmpl = `
 				<header class="navbar">
 					<section class="navbar-section">
 						<ul class="breadcrumb">
-							<li class="breadcrumb-item">
-								<a href="/">Home</a>
-							</li>
-							<li class="breadcrumb-item">
-								<a href="#">{{.Title}}</a>
-							</li>
+							<li class="breadcrumb-item"><a href="/">Home</a></li>
+							<li class="breadcrumb-item"><a href="#">{{.Title}}</a></li>
 						</ul>
-					</section>
-					<section class="navbar-section">
-						<div class="btn-group btn-group-block">
-							<button class="btn btn-primary"><i class="icon icon-mail"></i></button>
-							<button class="btn btn-primary"><i class="icon icon-download"></i></button>
-							<button class="btn btn-primary"><i class="icon icon-edit"></i></button>
-							<button class="btn btn-primary"><i class="icon icon-delete"></i></button>
-						</div>
 					</section>
 				</header>
 			</div>
@@ -159,9 +151,7 @@ var baseTmpl = `
 		<div class="divider pb-2"></div>
 		<div class="columns">
 			<div class="column col-6 col-xl-8 col-lg-10 col-md-12 col-mx-auto">
-				<div class="markdown-body">
-				{{.HTML}}
-				</div>
+				<div class="markdown-body">{{.HTML}}</div>
 			</div>
 		</div>
 	</section>
