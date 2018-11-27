@@ -1,11 +1,15 @@
-.PHONY: build build-run clean
+.PHONY: build clean run build-run
 
-build: clean
+wiki: main.go
 	go get -t ./
 	go build  ./
 
-build-run: build
-	./wiki
+build: wiki
 
 clean:
 	rm -f wiki
+
+run: build
+	./wiki
+
+build-run: build run
